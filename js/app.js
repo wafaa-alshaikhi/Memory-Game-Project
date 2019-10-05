@@ -19,18 +19,21 @@ let counter = 0;
 let minutesTime = 0;
 let secTime = 0;
 let gameEnd = false;
-let starsStringRaiting;
+let starsStringRaiting ="three";
 let stars = document.querySelectorAll(".fa-star");//list of all stars
 let menuteTimeHTML = document.querySelector(".minutes");
 let secTimeHTML = document.querySelector(".seconds");
+let DmenuteTimeHTML = document.querySelector(".Dminutes");
+let DsecTimeHTML = document.querySelector(".Dseconds");
 let testFlag = 0;
 let playAgainFlag = false;
 let timer;
 let playerMoves = document.querySelector(".moves");
 let resatrt = document.querySelector(".restart");//holde the retart Button
-
+let dialogMessageParagraph= document.querySelector(".pMessage");
 let restartIsClick=false;
-
+let dialogMessge=document.getElementById("dialogMessge");
+let yesButton=false;
 //this function counting for the timer  
 
 
@@ -39,11 +42,13 @@ let restartIsClick=false;
 */
 function startTimer() {
     timer = setInterval(function timeIt() {
-        if (!gameEnd) {
+        if (!gameEnd || yesButton || restartIsClick) {
             // counting
             secTime++;
-            secTimeHTML.innerHTML = secTime;
+            
+         secTimeHTML.innerHTML = secTime;
             menuteTimeHTML.innerHTML = minutesTime;
+        
             // If 1 minute is over
             if (secTime == 60) {
                 minutesTime++;
@@ -53,15 +58,21 @@ function startTimer() {
     }, 1000);
 }//end of startTimer function
 
-
+/**
+* @description To cshow dialog Message After the user Win
+*/
+function dialog (){
+    clearTimeout(timer);
+             dialogMessageParagraph.innerHTML="Congratulations your time is : "+minutesTime +" : "+secTime+" Your rating is : "+starsStringRaiting+" stars "+" <br> <h5>Would you like to play again ?</h5>";
+             dialogMessge.showModal();          
+}
 
 // start  code
 startTimer();
 cardEventListener();
-
-
-
-
+stars[0].classList.add("coloerdStar");
+stars[1].classList.add("coloerdStar");
+stars[2].classList.add("coloerdStar");
 
 /**
 * @description write the shuffeld card to HTML page .
@@ -74,9 +85,6 @@ function initGame() {
     });
     deck.innerHTML = cardHTML.join("");
 }
-
-
-
 
 /**
 * @description build HTML list items code
@@ -112,6 +120,11 @@ function shuffle(array) {
 * @description lesten to the card clicked
 */
 function cardEventListener() {
+    if(yesButton){
+     console.log("yes 2 Button is clicked!") 
+      
+    }
+    
     if(restartIsClick){
         console.log("I'm in cardEventListener After click restart ")
     }
@@ -123,18 +136,38 @@ function cardEventListener() {
         
         //this for each execute  on each item in an array element (each card)
         card.addEventListener("click", function (e) {//to heare the Event 
-                   
+            // thanks for Ahmad who's help me to solve this problem :)
+                   if(this.classList.contains("open")){
+                       console.log("this card is alredy open !");
+                       return;
+                   }
             if(restartIsClick){
                 console.log("I'm in card.addEventListener After click restart ")
             }
 
-            if (!card.classList.contains("open" && !card.classList.contains("show"))) {//if the card not opend before
+            if (!card.classList.contains("open" & !card.classList.contains("show"))) {//if the card not opend before
                 //here increment the moves 
                 moves++;
                 playerMoves.innerHTML = moves;
+                if (moves > 14 && moves <20) {
+                    //2 star 
+                    starsStringRaiting = "two ";
+                    
+                    stars[2].classList.remove("coloerdStar");
+
+                } else if  (moves> 20 && moves< 30 ) {
+                    //1 stars
+                    starsStringRaiting = "one ";
+                    stars[1].classList.remove("coloerdStar");
+                    
+
+                } else if (moves > 30){
+                    starsStringRaiting = "zero";
+                    stars[0].classList.remove("coloerdStar");
+                }
+                
                 opendCard.push(card);// to counting the opened card
                 card.classList.add("open", "show"); //add two class (open and show ) for the clicked card
-
                 //To prevent the user from opening more than two cards
                 if (opendCard.length == 2) {
                     //if match
@@ -151,35 +184,12 @@ function cardEventListener() {
                             opendCard[1].classList.add("show");
                             opendCard[1].classList.add("open");
                             opendCard = []; //to empty the array
-                        if (CountMatchingCards == 2) {//i put it in timeout cuse i noteced that its realy fast than show the last card .
-
-                            gameEnd = true;
-                           
-
-                            if (moves < 14) {
-                                //3 star 
-                                starsStringRaiting = "3 stars";
-                                stars[0].classList.add("coloerdStar");
-                                stars[1].classList.add("coloerdStar");
-                                stars[2].classList.add("coloerdStar");
-
-                            } else if (moves < 20) {
-                                //2 stars
-                                starsStringRaiting = "2 stars";
-                                stars[0].classList.add("coloerdStar");
-                                stars[1].classList.add("coloerdStar");
-
-                            } else {
-                                //1 stars
-                                starsStringRaiting = "1 stars";
-                                stars[0].classList.add("coloerdStar");
-
-                            }
-
-
+                        if (CountMatchingCards == 16) {//i put it in timeout cuse i noteced that its realy fast than show the last card .                 
+                            gameEnd = true; 
+                            dialog();  
                         }//end if the game end 
-                        window.confirm("Congratulations your  time is : " + minutesTime + " : " + secTime + " and you got  : " + starsStringRaiting);
-
+                        //window.confirm("Congratulations your  time is : " + minutesTime + " : " + secTime + " and you got  : " + starsStringRaiting);
+                        
 
                     } //end if  match
 
@@ -209,21 +219,15 @@ function cardEventListener() {
                 //we need to close the cards and prevent the user to open more than two .
 
             }//end if the cards have not open and show 
-
-
-
         });  // end of add event listener for each card 
-
-
     });// end of add  for each card 
-
-
 }
+
 /**
 * @description Reset cards, time, ratings and then start again
 */
-resatrt.addEventListener("click", function () {
-    console.log("the restart clicked");
+function restartGame(){
+    console.log("the restart clicked the values : gameEnd="+gameEnd+"  yes butons"+yesButton);
     restartIsClick=true;
     playAgainFlag = true;
     minutesTime = 0;
@@ -234,15 +238,29 @@ resatrt.addEventListener("click", function () {
     menuteTimeHTML.innerHTML = minutesTime;
     playerMoves.innerHTML = moves;
     initGame();
-    allCards = document.querySelectorAll(".card"); // here
+    allCards = document.querySelectorAll(".card"); 
     clearTimeout(timer);
-    startTimer();
+    startTimer();   
     cardEventListener();
+}
+
+
+resatrt.addEventListener("click", function () {
+   
+    restartGame();
 
 });
-
-
-
-
-
+//dialog Buttons 
+document.querySelector("#noButton").addEventListener("click",function(){
+    clearTimeout(timer);
+    secTimeHTML.innerHTML = secTime;
+    menuteTimeHTML.innerHTML = minutesTime;
+    dialogMessge.close();
+})
+document.querySelector("#yesButton").addEventListener("click",function(){
+    console.log("the 1 yes button clicked");
+    yesButton=true;
+    restartGame();
+    dialogMessge.close();
+ })
 
