@@ -63,8 +63,10 @@ function startTimer() {
 */
 function dialog (){
     clearTimeout(timer);
-             dialogMessageParagraph.innerHTML="Congratulations your time is : "+minutesTime +" : "+secTime+" Your rating is : "+starsStringRaiting+" stars "+" <br> <h5>Would you like to play again ?</h5>";
-             dialogMessge.showModal();          
+           //  dialogMessageParagraph.innerHTML="Congratulations your time is : "+minutesTime +" : "+secTime+" Your rating is : "+starsStringRaiting+"  "+" <br> <h5>Would you like to play again ?</h5>";
+           dialogMessageParagraph.innerHTML=`Congratulations your time is : ${minutesTime}  : ${secTime}  Your rating is : ${starsStringRaiting}    <br> <h5>Would you like to play again ?</h5>`;
+
+           dialogMessge.showModal();          
 }
 
 // start  code
@@ -151,20 +153,17 @@ function cardEventListener() {
                 playerMoves.innerHTML = moves;
                 if (moves > 14 && moves <20) {
                     //2 star 
-                    starsStringRaiting = "two ";
+                    starsStringRaiting = "two stars ";
                     
                     stars[2].classList.remove("coloerdStar");
 
                 } else if  (moves> 20 && moves< 30 ) {
                     //1 stars
-                    starsStringRaiting = "one ";
+                    starsStringRaiting = "one star ";
                     stars[1].classList.remove("coloerdStar");
                     
 
-                } else if (moves > 30){
-                    starsStringRaiting = "zero";
-                    stars[0].classList.remove("coloerdStar");
-                }
+                } 
                 
                 opendCard.push(card);// to counting the opened card
                 card.classList.add("open", "show"); //add two class (open and show ) for the clicked card
